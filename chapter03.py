@@ -9,16 +9,16 @@
 import os
 import time
 
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.units import cm
 from reportlab.lib.enums import TA_JUSTIFY
-from reportlab.platypus import SimpleDocTemplate, Paragraph
-from reportlab.platypus import Frame, Spacer, Image
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.rl_config import defaultPageSize
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, NextPageTemplate
+from reportlab.platypus import Frame, Spacer, Image, PageTemplate, PageBreak
 
 
 def registry_font(font):
@@ -229,5 +229,50 @@ def frame_demo():
     mycanvas.save()
 
 
+def alternate_orientation():
+    """
+        Criando paginas com em formaro landscape e quebra de pagina com
+        PageBreak
+    """
+
+    doc = SimpleDocTemplate(
+        'gen/cap03/alternate_orientation.pdf',
+        pagesize=A4,
+        rightMargin=1*cm,
+        leftMargin=1.5*cm,
+        topMargin=2.5*cm,
+        bottomMargim=1.5*cm)
+
+    styles = getSampleStyleSheet()
+    normal = styles['Normal']
+
+    # Aqui criamos um frame e um template para cada tipo de orientação
+    margin = 0.5 * cm
+    frame = Frame(margin, margin, doc.width, doc.height, id='frame')
+    frame_landscape = Frame(margin, margin, doc.height, doc.width, id='frame')
+    portrait_template = PageTemplate(
+        id='portrait', frames=[frame], pagesize=A4)
+    landscape_template = PageTemplate(
+        id='landscape', frames=[frame_landscape], pagesize=landscape(A4))
+
+    doc.addPageTemplates([portrait_template, landscape_template])
+
+    story = []
+    story.append(Paragraph('This is a page in portrait orientation', normal))
+
+    # alterar a orientação da página para landscape
+    story.append(NextPageTemplate('landscape'))
+    story.append(PageBreak())
+    story.append(Spacer(cm, 0.5*cm))
+    story.append(Paragraph('This is a page in landscape orientation', normal))
+
+    # altera a orientação de volta para retrato
+    story.append(NextPageTemplate('portrait'))
+    story.append(PageBreak())
+    story.append(Paragraph('Now back to portrait again', normal))
+
+    doc.build(story)
+
+
 if __name__ == '__main__':
-    frame_demo()
+    alternate_orientation()
