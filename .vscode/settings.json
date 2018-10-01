@@ -1,0 +1,6 @@
+{
+    "python.envFile": "C:/Users/alisson/www/envs/reportlab_book/Lib/",
+    "python.pythonPath": "C:/Users/alisson/www/envs/reportlab_book/Scripts/python",
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": false
+}
